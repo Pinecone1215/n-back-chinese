@@ -1,0 +1,61 @@
+@charset "UTF-8";
+[hidden] { display: none !important; }
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html { font-size: 16px; }
+
+body { 
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    font-weight: 700;
+
+    user-select: none;
+    cursor: default;
+}
+
+main {
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.cover {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6rem;
+}
+
+.cover h1 {
+    font-size: 3.6rem;
+}
+
+#start-button {
+    font-family: inherit;
+    font-weight: inherit;
+}
+
+#start-button {
+    width: 12rem;
+    height: 3.5rem;
+    background-color: transparent;
+
+    border: 2px solid rgba(0, 0, 0, 0.5);
+    border-radius: 2rem;
+    font-size: 1.6rem;
+    
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#start-button:hover {
+    background-color: rgba(0, 0, 0, 0.3);;
+}
