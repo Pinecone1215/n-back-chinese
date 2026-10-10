@@ -16,7 +16,70 @@
         </div>
 
         <div class="instruction" hidden>
-            <section></section  hidden>
+            <section hidden>
+                <h2>作業說明</h2>
+                <p>螢幕上會依序出現不同的英文字母。</p>
+                <p>請判斷目前的字母，是否與前面指定位置的字母相同。</p>
+                <p>本作業包含兩個階段，將依序進行：</p>
+                <ol>
+                    <li><strong>2-back：</strong>與前面第 2 個字母比較。</li>
+                    <li><strong>3-back：</strong>與前面第 3 個字母比較。</li>
+                </ol>
+                <p>接下來將先說明 2-back 的作答方式。</p>
+            </section>
+
+            <section hidden>
+                <h2>2-back 作答方式</h2>
+                <p>每當字母出現時，請判斷它是否與<strong>前面第 2 個字母相同</strong>。</p>
+                <p>也就是隔著一個字母，與再前一個字母比較。</p>
+                <ul>
+                    <li><strong>相同：</strong>請按 <kbd class="same-key">待確認</kbd>。</li>
+                    <li><strong>不同：</strong>請按 <kbd class="different-key">待確認</kbd>。</li>
+                </ul>
+                <p>最前面的 2 個字母沒有可比較的對象，請回答<strong>「不同」</strong>。</p>
+            </section>
+
+            <section hidden>
+                <h2>2-back 範例</h2>
+                <p>假設字母依照以下順序出現：</p>
+                <p class="letter-example">
+                    M　N　<strong>M</strong>　C　N　P　Q　<strong>P</strong>
+                </p>
+
+                <ul>
+                    <li>第 3 個字母 <strong>M</strong>，與第 1 個字母 <strong>M</strong> 相同，因此回答<strong>「相同」</strong>。</li>
+                    <li>第 8 個字母 <strong>P</strong>，與第 6 個字母 <strong>P</strong> 相同，因此回答<strong>「相同」</strong>。</li>
+                    <li>這個範例中的其餘字母，皆回答<strong>「不同」</strong>。</li>
+                </ul>
+                <p>粗體僅用於標示範例答案，測驗時的字母不會標示正確答案。</p>
+            </section>
+
+            <section hidden>
+                <h2>準備開始練習</h2>
+                <ul>
+                    <li><strong>每個字母都需要作答</strong>，包括最前面的 2 個字母。</li>
+                    <li>請在字母出現後，盡快且正確地回答。</li>
+                    <li>作業過程中不會顯示答對或答錯的提示。</li>
+                </ul>
+                <p>接下來將先進行 2-back 練習。</p>
+                <p>準備好後，請按<strong>空白鍵</strong>開始練習。</p>
+            </section>
+
+            <section hidden>
+                <h2>3-back 作答方式</h2>
+                <p>接下來請改為判斷目前的字母，是否與<strong>前面第 3 個字母相同</strong>。</p>
+                <p>也就是隔著兩個字母，與再前一個字母比較。</p>
+                <ul>
+                    <li><strong>相同：</strong>請按 <kbd class="same-key">待確認</kbd>。</li>
+                    <li><strong>不同：</strong>請按 <kbd class="different-key">待確認</kbd>。</li>
+                </ul>
+                <p>例如，字母依序出現：</p>
+                <p class="letter-example">M　N　B　<strong>M</strong></p>
+                <p>第 4 個字母 <strong>M</strong>，與第 1 個字母 <strong>M</strong> 相同，因此回答<strong>「相同」</strong>。</p>
+                <p>最前面的 3 個字母沒有可比較的對象，請回答<strong>「不同」</strong>。</p>
+                <p>準備好後，請按<strong>空白鍵</strong>開始 3-back 作業。</p>
+            </section>
+            
             <nav class="navigation" hidden>
                 <button id="back-button">上一頁</button>
                 <span id="page-position"></span>
