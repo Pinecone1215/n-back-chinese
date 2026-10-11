@@ -8,7 +8,7 @@ const next_button = document.getElementById('next-button');
 const back_button = document.getElementById('back-button');
 const page_position = document.getElementById('page-position');
 
-const practice_1 = document.getElementById('practice-1');
+const practice_section = document.getElementById('practice-section');
 
 let position = -1;
 
@@ -98,7 +98,7 @@ document.addEventListener('keydown', async (event) => {
 
         try {
             practicing = true;
-            await practice(practice_1, 2);
+            await practice(practice_section, 2);
         } finally {
             practicing = false;
             show_page(3);
@@ -113,8 +113,8 @@ document.addEventListener("keydown", (event) => {
     if (!practicing || event.repeat) return;
     if (event.code !== "KeyF" && event.code !== "KeyJ") return;
 
-    const letter = practice_1.querySelector(".letter");
-    const feedback = practice_1.querySelector(".feedback");
+    const letter = practice_section.querySelector(".letter");
+    const feedback = practice_section.querySelector(".feedback");
 
     if (letter.hidden || answered || correct_response === null) return;
 
