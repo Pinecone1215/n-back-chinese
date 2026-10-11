@@ -12,23 +12,19 @@ html { font-size: 16px; }
 body { 
     font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
     font-weight: 700;
-
     user-select: none;
     cursor: default;
 }
 
-:root {
-    --navigation-height: 8rem;
-    --content-width: 75%;
-}
-
 main {
-    min-height: 100vh;
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
 
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 
 button {
@@ -47,48 +43,65 @@ button {
     transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: rgba(0, 0, 0, 0.3);
-}
+button:hover { background-color: rgba(0, 0, 0, 0.3); }
 
-div {
+.cover,
+.instruction {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    margin: auto;
+    flex-shrink: 0;
 }
 
-.cover,
-.instruction {
-    gap: 1.6rem;
-}
+h1,
+ul { border: 2px solid blue; }
 
+.cover { gap: 1.6rem; }
 .cover h1 { font-size: 3.6rem; }
 
 .instruction {
-    width: var(--content-width);
-    height: 100vh;
-    padding-bottom: var(--navigation-height);
+    width: 64rem;
+    gap: 1rem;
 }
+
+.instruction > section,
+.navigation { flex-shrink: 0; }
 
 section {
-    border: 2px solid gray;
     width: 100%;
-    height: 100%;
+    height: 32rem;
+
+    border: 2px solid gray;
+    border-radius: 1rem;
+    overflow: auto;
 }
 
+.instruction > section:nth-of-type(1) h1 {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 3.2rem;
+}
+
+.instruction > section:nth-of-type(1) ul {
+    margin-top: 2rem;
+    width: 52rem;
+    transform: translateX(6rem);
+
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.instruction > section:nth-of-type(1) li { font-size: 1.6rem; }
+
 .navigation {
-    position: fixed;
-    bottom: 0;
-
-    width: var(--content-width);
-    height: var(--navigation-height);
-    border-top: 1px solid gray;
-
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    z-index: 10;
 }
 
 #page-position { font-size: 1.6rem; }
