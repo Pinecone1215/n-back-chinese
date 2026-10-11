@@ -43,25 +43,40 @@ function wait_until(target_timestamp, action = () => {}) {
 function show_elements(elements) { elements.forEach((e) => { e.hidden = false; }); }
 function hide_elements(elements) { elements.forEach((e) => { e.hidden = true; }); }
 
+let correct_response = null;
+let answered = false;
 async function practice(section, n) {
     const letters = ["B", "S", "T", "M", "T", "K", "N", "R", "Y", "R", "T"];
     const letter = section.querySelector(".letter");
     const fixation = section.querySelector(".fixation");
+    const feedback = section.querySelector(".feedback");
     const msg = section.querySelector(".msg");
 
-    let timestamp = await wait_until(0, () => { hide_elements([letter, fixation, msg]); });
+    let timestamp = await wait_until(0, () => {
+        correct_response = null;
+        answered = false;
+        hide_elements([letter, fixation, msg, feedback]);
+    });
+
     timestamp = await wait_until(timestamp + 1000, () => { show_elements([fixation]); });
     timestamp = await wait_until(timestamp + 1000, () => { hide_elements([fixation]); });
 
-    for (const l of letters) {
+    for (const [index, l] of letters.entries()) {
         timestamp = await wait_until(timestamp + 1000, () => {
+            const same = index >= n && l === letters[index - n];
+
+            correct_response = same ? "F" : "J";
+            answered = false;
+
+            hide_elements([feedback]);
             letter.textContent = l;
             show_elements([letter]);
         });
     }
 
     await wait_until(timestamp + 1000, () => {
-        hide_elements([letter]);
+        correct_response = null;
+        hide_elements([letter, feedback]);
         show_elements([msg]);
     });
 }
@@ -93,17 +108,24 @@ document.addEventListener('keydown', async (event) => {
     if (position === 3 && !practicing) {}
 });
 
-document.addEventListener('keydown', (event) => {
+document.addEventListener("keydown", (event) => {
     if (!practicing || event.repeat) return;
-    if (event.code !== 'KeyF' && event.code !== 'KeyJ') return;
+    if (event.code !== "KeyF" && event.code !== "KeyJ") return;
 
-    const letter = practice_1.querySelector('.letter');
-    if (letter.hidden) return;
+    const letter = practice_1.querySelector(".letter");
+    const feedback = practice_1.querySelector(".feedback");
+
+    if (letter.hidden || answered || correct_response === null) return;
+
     event.preventDefault();
+    answered = true;
 
-    const response = event.code === 'KeyF' ? 'F' : 'J';
-    console.log('目前字母：', letter.textContent);
-    console.log('受試者回答：', response);
+    const response = event.code === "KeyF" ? "F" : "J";
+    const correct = response === correct_response;
+
+    feedback.textContent = correct ? "答對！" : "答錯！";
+    feedback.style.color = correct ? "darkgreen" : "firebrick";
+    show_elements([feedback]);
 });
 
 show_page(-1);

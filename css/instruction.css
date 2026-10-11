@@ -153,11 +153,21 @@ section {
     align-items: center;
 }
 
+#practice-1 { position: relative; }
+
 .letter,
 .fixation {
     line-height: 1;
     font-size: 12rem;
     font-weight: 400;
+}
+
+.feedback {
+    position: absolute;
+    bottom: 2rem;
+    left: 0;
+    width: 100%;
+    text-align: center;
 }
 
 .msg { font-size: 2rem; }
