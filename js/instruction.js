@@ -62,7 +62,8 @@ async function practice(section, n) {
     timestamp = await wait_until(timestamp + 1000, () => { hide_elements([fixation]); });
 
     for (const [index, l] of letters.entries()) {
-        timestamp = await wait_until(timestamp + 1000, () => {
+        const time = (index === 0) ? 1000 : 2000;
+        timestamp = await wait_until(timestamp + time, () => {
             const same = index >= n && l === letters[index - n];
 
             correct_response = same ? "F" : "J";
@@ -74,7 +75,7 @@ async function practice(section, n) {
         });
     }
 
-    await wait_until(timestamp + 1000, () => {
+    await wait_until(timestamp + 2000, () => {
         correct_response = null;
         hide_elements([letter, feedback]);
         show_elements([msg]);

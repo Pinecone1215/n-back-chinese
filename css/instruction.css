@@ -68,11 +68,11 @@ li, p { font-size: 1.6rem; }
     flex-shrink: 0;
 }
 
-h1,
+/*h1,
 h2,
 p,
 ul,
-#fixation { border: 2px solid blue; }
+#fixation { border: 2px solid blue; }*/
 
 .cover { gap: 1.6rem; }
 .cover h1 { font-size: 3.6rem; }
@@ -164,7 +164,7 @@ section {
 
 .feedback {
     position: absolute;
-    bottom: 2rem;
+    bottom: 4rem;
     left: 0;
     width: 100%;
     text-align: center;
