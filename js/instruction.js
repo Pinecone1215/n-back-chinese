@@ -28,58 +28,42 @@ function show_page(new_position) {
     next_button.textContent = press_space ? '請按空白鍵' : '下一頁';
 }
 
-function wait_until(target_timestamp) {
+function wait_until(target_timestamp, action = () => {}) {
     return new Promise((resolve) => {
         function check_time(timestamp) {
             if (timestamp >= target_timestamp) {
+                action(timestamp);
                 resolve(timestamp);
-            }else { requestAnimationFrame(check_time); }
+            } else { requestAnimationFrame(check_time); }
         }
         requestAnimationFrame(check_time);
     });
 }
 
-function show_elements(elements) {
-    return new Promise((resolve) => {
-        requestAnimationFrame((timestamp) => {
-            elements.forEach((e) => { e.hidden = false; });
-            resolve(timestamp);
-        });
-    });
-}
-
-function hide_elements(elements) {
-    return new Promise((resolve) => {
-        requestAnimationFrame((timestamp) => {
-            elements.forEach((e) => { e.hidden = true; });
-            resolve(timestamp);
-        });
-    });
-}
+function show_elements(elements) { elements.forEach((e) => { e.hidden = false; }); }
+function hide_elements(elements) { elements.forEach((e) => { e.hidden = true; }); }
 
 async function practice(section, n) {
-    const letters = ["B", "S", "T", "M", "T", "K", "N", "R", "Y", "R", "T",];
+    const letters = ["B", "S", "T", "M", "T", "K", "N", "R", "Y", "R", "T"];
     const letter = section.querySelector(".letter");
     const fixation = section.querySelector(".fixation");
     const msg = section.querySelector(".msg");
 
-    let timestamp = await hide_elements([letter, fixation, msg]);
-    await wait_until(timestamp + 1000);
+    let timestamp = await wait_until(0, () => { hide_elements([letter, fixation, msg]); });
+    timestamp = await wait_until(timestamp + 1000, () => { show_elements([fixation]); });
+    timestamp = await wait_until(timestamp + 1000, () => { hide_elements([fixation]); });
 
-    timestamp = await show_elements([fixation]);
-    await wait_until(timestamp + 1000);
-
-    timestamp = await hide_elements([fixation]);
-    await wait_until(timestamp + 1000);
-
-    for(const l of letters) {
-        letter.textContent = l;
-        timestamp = await show_elements([letter]);
-        await wait_until(timestamp + 1000);
+    for (const l of letters) {
+        timestamp = await wait_until(timestamp + 1000, () => {
+            letter.textContent = l;
+            show_elements([letter]);
+        });
     }
 
-    await hide_elements([letter]);
-    await show_elements([msg]);
+    await wait_until(timestamp + 1000, () => {
+        hide_elements([letter]);
+        show_elements([msg]);
+    });
 }
 
 start_button.addEventListener('click', () => { show_page(0); });
@@ -107,6 +91,19 @@ document.addEventListener('keydown', async (event) => {
     };
 
     if (position === 3 && !practicing) {}
+});
+
+document.addEventListener('keydown', (event) => {
+    if (!practicing || event.repeat) return;
+    if (event.code !== 'KeyF' && event.code !== 'KeyJ') return;
+
+    const letter = practice_1.querySelector('.letter');
+    if (letter.hidden) return;
+    event.preventDefault();
+
+    const response = event.code === 'KeyF' ? 'F' : 'J';
+    console.log('目前字母：', letter.textContent);
+    console.log('受試者回答：', response);
 });
 
 show_page(-1);
