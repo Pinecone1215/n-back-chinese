@@ -47,6 +47,14 @@ button {
 
 button:hover { background-color: rgba(0, 0, 0, 0.3); }
 
+button:disabled { 
+    cursor: default;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    color: rgba(0, 0, 0, 0.2);
+}
+
+button:disabled:hover { background-color: transparent; }
+
 li, p { font-size: 1.6rem; }
 
 .cover,
@@ -60,10 +68,11 @@ li, p { font-size: 1.6rem; }
     flex-shrink: 0;
 }
 
-/*h1,
+h1,
 h2,
 p,
-ul { border: 2px solid blue; }*/
+ul,
+#fixation { border: 2px solid blue; }
 
 .cover { gap: 1.6rem; }
 .cover h1 { font-size: 3.6rem; }
@@ -136,6 +145,19 @@ section {
     border-radius: 0.25rem;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.1);
+}
+
+.instruction > section:nth-of-type(4) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#letter,
+#fixation {
+    line-height: 1;
+    font-size: 12rem;
+    font-weight: 400;
 }
 
 .navigation {
