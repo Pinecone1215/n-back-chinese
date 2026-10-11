@@ -15,7 +15,7 @@
             <button id="start-button">實驗說明</button>
         </div>
 
-        <div class="instruction">
+        <div class="instruction" hidden>
             <section hidden>
                 <h1>歡迎參加字母 N-back 遊戲！</h1>
                 <ul>
@@ -44,9 +44,10 @@
                 </ul>
             </section>
 
-            <section hidden>
-                <p id="fixation" hidden>+</p>
-                <p id="letter">A</p>
+            <section id="practice-1" hidden>
+                <p class="letter" hidden></p>
+                <p class="fixation" hidden>+</p>
+                <p class="msg" hidden>練習完成！請按空白鍵開始正式作業</p>
             </section>
 
             <nav class="navigation" hidden>

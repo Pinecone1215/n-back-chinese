@@ -153,12 +153,14 @@ section {
     align-items: center;
 }
 
-#letter,
-#fixation {
+.letter,
+.fixation {
     line-height: 1;
     font-size: 12rem;
     font-weight: 400;
 }
+
+.msg { font-size: 2rem; }
 
 .navigation {
     width: 100%;
