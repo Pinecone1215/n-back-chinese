@@ -1,10 +1,13 @@
 const start_screen = document.getElementById("start-screen");
 const stimulus_screen = document.getElementById("stimulus-screen");
+const instruction_screen = document.getElementById("instruction");
 const msg_screen = document.getElementById("msg-screen");
+
 const letter = stimulus_screen.querySelector(".letter");
 const fixation = stimulus_screen.querySelector(".fixation");
-const participant_id = sessionStorage.getItem("participant_id");
 const continue_btn = document.getElementById("continue");
+
+const participant_id = sessionStorage.getItem("participant_id");
 
 const letters_2_back = [
     "B", "P", "C", "P", "V", "T", "V", "R", "B", "R",
@@ -29,7 +32,7 @@ const letters_map = {
 };
 
 const time_limit = 1500;
-const results = JSON.parse(sessionStorage.getItem("results") ?? "[]");
+const results = [];
 
 let stimulus_timestamp = null;
 let response = null;
@@ -57,7 +60,22 @@ function wait_until(target_timestamp, action = () => {}) {
                 requestAnimationFrame(check_time);
             }
         }
+
         requestAnimationFrame(check_time);
+    });
+}
+
+function wait_for_space() {
+    return new Promise((resolve) => {
+        function on_keydown(event) {
+            if (event.code !== "Space" || event.repeat) return;
+
+            event.preventDefault();
+            document.removeEventListener("keydown", on_keydown);
+            resolve();
+        }
+
+        document.addEventListener("keydown", on_keydown);
     });
 }
 
@@ -97,7 +115,7 @@ async function n_back(n) {
     });
 
     for (const [index, l] of letters.entries()) {
-        const time = (index === 0) ? 1000 : 2000;
+        const time = (index === 0) ? 1000 : time_limit;
 
         timestamp = await wait_until(
             timestamp + time,
@@ -119,7 +137,7 @@ async function n_back(n) {
         );
     }
 
-    await wait_until(timestamp + 2000, () => {
+    await wait_until(timestamp + time_limit, () => {
         record_result(n, letters.length);
 
         testing = false;
@@ -135,22 +153,36 @@ async function main() {
         return;
     }
 
-    stimulus_screen.hidden = false;
-    const n = Number(sessionStorage.getItem("n") ?? "2");
+    // 新測驗從 2-back 開始，清空上一輪暫存結果。
+    results.length = 0;
+    sessionStorage.setItem("results", JSON.stringify(results));
 
-    if (n === 2) {
-        await n_back(2);
-        sessionStorage.setItem("n", 3);
-        window.location.href = "instruction.html";
-        return;
-    }
+    show_elements([stimulus_screen]);
+    await n_back(2);
 
-    if (n !== 3) throw new Error("無效的 N-back 階段。");
+    // 在同一頁顯示 3-back 說明，等待空白鍵。
+    hide_elements([stimulus_screen]);
+    show_elements([instruction_screen]);
+    await wait_for_space();
 
+    hide_elements([instruction_screen]);
+    show_elements([stimulus_screen]);
     await n_back(3);
-    stimulus_screen.hidden = true;
-    msg_screen.hidden = false;
+
+    // 此時 results 共包含 50 + 60 = 110 筆結果。
+    hide_elements([stimulus_screen]);
+    show_elements([msg_screen]);
 }
+
+// 統一初始畫面。
+show_elements([start_screen]);
+hide_elements([
+    stimulus_screen,
+    instruction_screen,
+    msg_screen,
+    letter,
+    fixation
+]);
 
 document.addEventListener("keydown", async (event) => {
     if (event.code !== "Space" || event.repeat || start_screen.hidden) return;
@@ -185,5 +217,6 @@ document.addEventListener("keydown", (event) => {
 });
 
 continue_btn.addEventListener("click", () => {
-    window.location.href = "https://pinecone1215.github.io/pal-task-chinese/participant_info.html";
+    window.location.href =
+        "https://pinecone1215.github.io/pal-task-chinese/participant_info.html";
 });

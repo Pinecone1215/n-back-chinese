@@ -92,6 +92,66 @@ main {
     font-weight: 400;
 }
 
+#instruction {
+    margin: auto;
+    width: 64rem;
+    height: 32rem;
+    flex-shrink: 0;
+}
+
+#instruction h1 {
+    font-size: 3.2rem;
+    text-align: center;
+}
+
+#instruction ul {
+    width: 54rem;
+    margin-top: 1rem;
+    padding-left: 2rem;
+    transform: translateX(4.8rem);
+}
+
+#instruction li {
+    font-size: 1.6rem;
+}
+
+#instruction p {
+    width: 54rem;
+    font-size: 1.6rem;
+    transform: translateX(4.8rem);
+}
+
+#instruction > p:nth-of-type(1) {
+    margin-top: 2rem;
+}
+
+#instruction > p:nth-of-type(2) {
+    margin-top: 1rem;
+    height: 3.2rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    
+    border: 2px solid gray;
+    border-radius: 0.25rem;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+#instruction > p:nth-of-type(3) {
+    margin-top: 1rem;
+}
+
+#instruction div {
+    margin-top: 2rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #msg-screen {
     margin: auto;
     width: 42rem;
