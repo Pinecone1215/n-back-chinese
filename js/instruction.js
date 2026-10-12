@@ -48,7 +48,7 @@ function hide_elements(elements) { elements.forEach((e) => { e.hidden = true; })
 let correct_response = null;
 let answered = false;
 async function practice(section, n) {
-    const letters = ["B", "S", "T", "M", "T", "K", "N", "R", "Y", "R", "T"];
+    const letters_practice = ["B", "S", "B", "T", "M", "T", "K", "N", "R", "Y", "R", "T"];
     const letter = section.querySelector(".letter");
     const fixation = section.querySelector(".fixation");
     const feedback = section.querySelector(".feedback");
@@ -63,10 +63,10 @@ async function practice(section, n) {
     timestamp = await wait_until(timestamp + 1000, () => { show_elements([fixation]); });
     timestamp = await wait_until(timestamp + 1000, () => { hide_elements([fixation]); });
 
-    for (const [index, l] of letters.entries()) {
+    for (const [index, l] of letters_practice.entries()) {
         const time = (index === 0) ? 1000 : 2000;
         timestamp = await wait_until(timestamp + time, () => {
-            const same = index >= n && l === letters[index - n];
+            const same = index >= n && l === letters_practice[index - n];
 
             correct_response = same ? "F" : "J";
             answered = false;

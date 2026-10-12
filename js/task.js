@@ -3,6 +3,28 @@ const stimulus_screen = document.getElementById("stimulus-screen");
 const letter = stimulus_screen.querySelector(".letter");
 const fixation = stimulus_screen.querySelector(".fixation");
 
+const letters_2_back = [
+    "B", "P", "C", "P", "V", "T", "V", "R", "B", "R",
+    "C", "D", "C", "Q", "X", "G", "R", "D", "P", "D",
+    "Q", "G", "Q", "L", "K", "L", "X", "D", "P", "T",
+    "S", "Q", "S", "T", "B", "T", "L", "K", "L", "D",
+    "P", "X", "P", "G", "C", "G", "D", "B", "Q", "B"
+];
+
+const letters_3_back = [
+    "N", "O", "X", "R", "O", "V", "T", "E", "V", "C",
+    "N", "P", "R", "V", "P", "R", "M", "B", "C", "Q",
+    "B", "N", "V", "B", "T", "M", "H", "T", "O", "H",
+    "R", "O", "R", "V", "B", "G", "V", "B", "D", "P",
+    "E", "D", "W", "M", "H", "W", "T", "F", "W", "X",
+    "D", "H", "X", "P", "C", "M", "P", "O", "B", "X"
+];
+
+const letters_map = {
+    2: letters_2_back,
+    3: letters_3_back
+}
+
 function show_elements(elements) { elements.forEach((e) => { e.hidden = false; }); }
 function hide_elements(elements) { elements.forEach((e) => { e.hidden = true; }); }
 function wait_until(target_timestamp, action = () => {}) {
@@ -21,7 +43,8 @@ let testing = false;
 let correct_response = null;
 let answered = false;
 async function n_back(n) {
-    const letters = ["B", "S", "T", "M", "T", "K", "N", "R", "Y", "R", "T"];
+    if(n !== 2 && n !== 3) return;
+    const letters = letters_map[n];
 
     let timestamp = await wait_until(0, () => {
         testing = true;
@@ -40,7 +63,7 @@ async function n_back(n) {
 
             correct_response = same ? "F" : "J";
             answered = false;
-
+            letter.style.color = "";
             letter.textContent = l;
             show_elements([letter]);
         });
@@ -77,6 +100,7 @@ document.addEventListener("keydown", (event) => {
     if (letter.hidden || answered || correct_response === null) return;
 
     event.preventDefault();
+    letter.style.color = "gray";
     answered = true;
 
     const response = event.code === "KeyF" ? "F" : "J";
