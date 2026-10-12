@@ -41,6 +41,7 @@ const key_map = {
 const time_limit = 1800;
 const results = [];
 
+let response_timestamp = null;
 let stimulus_timestamp = null;
 let response = null;
 let rt = null;
@@ -88,6 +89,8 @@ function wait_for_space() {
 
 function record_result(n, trial) {
     results.push({
+        stimulus_timestamp,
+        response_timestamp,
         participant_id,
         trial,
         condition: `${n}-back_Trials`,
@@ -135,6 +138,7 @@ async function n_back(n) {
                 answered = false;
                 response = null;
                 rt = null;
+                response_timestamp = null;
                 stimulus_timestamp = frame_timestamp;
 
                 letter.style.color = "";
@@ -214,11 +218,14 @@ document.addEventListener("keydown", (event) => {
 
     event.preventDefault();
 
-    const elapsed = performance.now() - stimulus_timestamp;
+    const current_timestamp = performance.now();
+    const elapsed = current_timestamp - stimulus_timestamp;
+
     if (elapsed < 0 || elapsed >= time_limit) return;
 
     answered = true;
     response = key_map[event.code];
+    response_timestamp = current_timestamp;
     rt = elapsed;
     letter.style.color = "gray";
 });
