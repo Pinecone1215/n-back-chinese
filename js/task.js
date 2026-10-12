@@ -1,7 +1,10 @@
 const start_screen = document.getElementById("start-screen");
 const stimulus_screen = document.getElementById("stimulus-screen");
+const msg_screen = document.getElementById("msg-screen");
 const letter = stimulus_screen.querySelector(".letter");
 const fixation = stimulus_screen.querySelector(".fixation");
+const participant_id = sessionStorage.getItem("participant_id");
+const continue_btn = document.getElementById("continue");
 
 const letters_2_back = [
     "B", "P", "C", "P", "V", "T", "V", "R", "B", "R",
@@ -23,27 +26,59 @@ const letters_3_back = [
 const letters_map = {
     2: letters_2_back,
     3: letters_3_back
+};
+
+const time_limit = 1500;
+const results = JSON.parse(sessionStorage.getItem("results") ?? "[]");
+
+let stimulus_timestamp = null;
+let response = null;
+let rt = null;
+
+let testing = false;
+let correct_response = null;
+let answered = false;
+
+function show_elements(elements) {
+    elements.forEach((e) => { e.hidden = false; });
 }
 
-function show_elements(elements) { elements.forEach((e) => { e.hidden = false; }); }
-function hide_elements(elements) { elements.forEach((e) => { e.hidden = true; }); }
+function hide_elements(elements) {
+    elements.forEach((e) => { e.hidden = true; });
+}
+
 function wait_until(target_timestamp, action = () => {}) {
     return new Promise((resolve) => {
         function check_time(timestamp) {
             if (timestamp >= target_timestamp) {
                 action(timestamp);
                 resolve(timestamp);
-            } else { requestAnimationFrame(check_time); }
+            } else {
+                requestAnimationFrame(check_time);
+            }
         }
         requestAnimationFrame(check_time);
     });
 }
 
-let testing = false;
-let correct_response = null;
-let answered = false;
+function record_result(n, trial) {
+    results.push({
+        participant_id,
+        trial,
+        condition: `${n}-back_Trials`,
+        response: response === null
+            ? "Timeout"
+            : response === "F" ? "Yes" : "No",
+        accuracy: answered && response === correct_response ? 1 : 0,
+        correct_answer: correct_response === "F" ? "Yes" : "No",
+        rt
+    });
+
+    sessionStorage.setItem("results", JSON.stringify(results));
+}
+
 async function n_back(n) {
-    if(n !== 2 && n !== 3) return;
+    if (n !== 2 && n !== 3) return;
     const letters = letters_map[n];
 
     let timestamp = await wait_until(0, () => {
@@ -53,36 +88,72 @@ async function n_back(n) {
         hide_elements([letter, fixation]);
     });
 
-    timestamp = await wait_until(timestamp + 1000, () => { show_elements([fixation]); });
-    timestamp = await wait_until(timestamp + 1000, () => { hide_elements([fixation]); });
+    timestamp = await wait_until(timestamp + 1000, () => {
+        show_elements([fixation]);
+    });
+
+    timestamp = await wait_until(timestamp + 1000, () => {
+        hide_elements([fixation]);
+    });
 
     for (const [index, l] of letters.entries()) {
         const time = (index === 0) ? 1000 : 2000;
-        timestamp = await wait_until(timestamp + time, () => {
-            const same = index >= n && l === letters[index - n];
 
-            correct_response = same ? "F" : "J";
-            answered = false;
-            letter.style.color = "";
-            letter.textContent = l;
-            show_elements([letter]);
-        });
+        timestamp = await wait_until(
+            timestamp + time,
+            (frame_timestamp) => {
+                if (index > 0) record_result(n, index);
+
+                const same = index >= n && l === letters[index - n];
+                correct_response = same ? "F" : "J";
+
+                answered = false;
+                response = null;
+                rt = null;
+                stimulus_timestamp = frame_timestamp;
+
+                letter.style.color = "";
+                letter.textContent = l;
+                show_elements([letter]);
+            }
+        );
     }
 
     await wait_until(timestamp + 2000, () => {
+        record_result(n, letters.length);
+
         testing = false;
         correct_response = null;
+        stimulus_timestamp = null;
         hide_elements([letter]);
     });
 }
 
 async function main() {
+    if (!participant_id) {
+        window.location.href = "participant_info.html";
+        return;
+    }
+
     stimulus_screen.hidden = false;
-    await n_back(2);
+    const n = Number(sessionStorage.getItem("n") ?? "2");
+
+    if (n === 2) {
+        await n_back(2);
+        sessionStorage.setItem("n", 3);
+        window.location.href = "instruction.html";
+        return;
+    }
+
+    if (n !== 3) throw new Error("無效的 N-back 階段。");
+
+    await n_back(3);
+    stimulus_screen.hidden = true;
+    msg_screen.hidden = false;
 }
 
-document.addEventListener('keydown', async (event) => {
-    if (event.code !== 'Space' || event.repeat || start_screen.hidden) return;
+document.addEventListener("keydown", async (event) => {
+    if (event.code !== "Space" || event.repeat || start_screen.hidden) return;
     event.preventDefault();
 
     start_screen.hidden = true;
@@ -90,7 +161,10 @@ document.addEventListener('keydown', async (event) => {
     try {
         if (!document.fullscreenElement && document.fullscreenEnabled)
             await document.documentElement.requestFullscreen();
-    } catch (error) { console.warn("無法進入全螢幕：", error); }
+    } catch (error) {
+        console.warn("無法進入全螢幕：", error);
+    }
+
     await main();
 });
 
@@ -100,12 +174,16 @@ document.addEventListener("keydown", (event) => {
     if (letter.hidden || answered || correct_response === null) return;
 
     event.preventDefault();
-    letter.style.color = "gray";
-    answered = true;
 
-    const response = event.code === "KeyF" ? "F" : "J";
-    const correct = response === correct_response;
-    console.log("letter: ", letter.textContent);
-    console.log("response: ", response);
-    console.log("correct: ", correct);
+    const elapsed = performance.now() - stimulus_timestamp;
+    if (elapsed < 0 || elapsed >= time_limit) return;
+
+    answered = true;
+    response = event.code === "KeyF" ? "F" : "J";
+    rt = elapsed;
+    letter.style.color = "gray";
+});
+
+continue_btn.addEventListener("click", () => {
+    window.location.href = "https://pinecone1215.github.io/pal-task-chinese/participant_info.html";
 });
