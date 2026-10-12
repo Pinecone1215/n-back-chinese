@@ -10,7 +10,7 @@ const practice_section = document.getElementById('practice-section');
 
 const pos_map = {
     2: '請按空白鍵',
-    3: '請按F/J鍵'
+    3: '請按 F/J 鍵'
 };
 
 let position = -1;

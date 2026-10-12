@@ -12,14 +12,15 @@
     <main>
         <div id="start-screen">
             <p>
-                按下「開始測驗」後，將進入全螢幕模式。<br>
+                按下「空白鍵」後，將進入全螢幕模式。<br>
                 測驗進行期間請保持全螢幕，並盡量不要切換至其他視窗。
             </p>
-            <button id="start-task-button">開始測驗</button>
+            <button disabled>請按空白鍵</button>
         </div>
 
-        <div id="stimulus-screen">
-            
+        <div id="stimulus-screen" hidden>
+            <p class="letter" hidden></p>
+            <p class="fixation" hidden>+</p>
         </div>
     </main>
 </body>
