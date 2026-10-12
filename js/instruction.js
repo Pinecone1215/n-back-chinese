@@ -18,7 +18,16 @@ const key_map = {
     KeyJ: "J"
 };
 
+const time_limit = 1800;
+const feedback_duration = 1500;
+
+let stimulus_timestamp = null;
+let response_timestamp = null;
+let correct_response = null;
+let answered = false;
+
 let position = -1;
+
 function show_page(new_position) {
     position = new_position;
     cover.hidden = position !== -1;
@@ -47,13 +56,29 @@ function wait_until(target_timestamp, action = () => {}) {
     });
 }
 
+function wait_for_response() {
+    return new Promise((resolve) => {
+        function check_time(timestamp) {
+            if (answered || timestamp >= stimulus_timestamp + time_limit) {
+                resolve(timestamp);
+            } else {
+                requestAnimationFrame(check_time);
+            }
+        }
+
+        requestAnimationFrame(check_time);
+    });
+}
+
 function show_elements(elements) { elements.forEach((e) => { e.hidden = false; }); }
 function hide_elements(elements) { elements.forEach((e) => { e.hidden = true; }); }
 
-let correct_response = null;
-let answered = false;
 async function practice(section, n) {
-    const letters_practice = ["B", "S", "B", "T", "M", "T", "K", "N", "R", "Y", "R", "T"];
+    const letters_practice = [
+        "B", "S", "B", "T", "M", "T",
+        "K", "N", "R", "Y", "R", "T"
+    ];
+
     const letter = section.querySelector(".letter");
     const fixation = section.querySelector(".fixation");
     const feedback = section.querySelector(".feedback");
@@ -62,31 +87,57 @@ async function practice(section, n) {
     let timestamp = await wait_until(0, () => {
         correct_response = null;
         answered = false;
+        stimulus_timestamp = null;
+        response_timestamp = null;
+
         hide_elements([letter, fixation, msg, feedback]);
     });
 
-    timestamp = await wait_until(timestamp + 1000, () => { show_elements([fixation]); });
-    timestamp = await wait_until(timestamp + 1000, () => { hide_elements([fixation]); });
+    timestamp = await wait_until(timestamp + 1000, () => {
+        show_elements([fixation]);
+    });
+
+    timestamp = await wait_until(timestamp + 1000, () => {
+        hide_elements([fixation]);
+    });
+
+    // 注視點消失後，等待 1000 ms。
+    timestamp = await wait_until(timestamp + 1000);
 
     for (const [index, l] of letters_practice.entries()) {
-        const time = (index === 0) ? 1000 : 1800;
-        timestamp = await wait_until(timestamp + time, () => {
-            const same = index >= n && l === letters_practice[index - n];
+        timestamp = await wait_until(0, (frame_timestamp) => {
+            const same =
+                index >= n && l === letters_practice[index - n];
 
-            correct_response = same ? "F" : "J";
             answered = false;
+            response_timestamp = null;
+            correct_response = same ? "F" : "J";
+
+            letter.textContent = l;
+            letter.style.removeProperty("color");
 
             hide_elements([feedback]);
-            letter.textContent = l;
             show_elements([letter]);
-        });
-    }
 
-    await wait_until(timestamp + 1800, () => {
+            stimulus_timestamp = frame_timestamp;
+        });
+
+        // 字母最多顯示 1800 ms，收到作答就提前結束等待。
+        timestamp = await wait_for_response();
+
+        // 有作答時，灰色字母及正誤回饋保留至按鍵後 1500 ms。
+        if (answered) {
+            timestamp = await wait_until(
+                response_timestamp + feedback_duration
+            );
+        }
+
         correct_response = null;
         hide_elements([letter, feedback]);
-        show_elements([msg]);
-    });
+    }
+
+    // 全部練習完成後，才顯示結束訊息。
+    show_elements([msg]);
 }
 
 start_button.addEventListener('click', () => { show_page(0); });
@@ -129,10 +180,19 @@ document.addEventListener("keydown", (event) => {
     if (letter.hidden || answered || correct_response === null) return;
 
     event.preventDefault();
+
+    const now = performance.now();
+
+    // 超過作答期限，不接受這次按鍵。
+    if (now >= stimulus_timestamp + time_limit) return;
+
+    response_timestamp = now;
     answered = true;
 
     const response = key_map[event.code];
     const correct = response === correct_response;
+
+    letter.style.color = "gray";
 
     feedback.textContent = correct ? "答對！" : "答錯！";
     feedback.style.color = correct ? "darkgreen" : "firebrick";
