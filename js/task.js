@@ -119,8 +119,6 @@ function record_result(n, trial) {
         correct_answer: correct_response === "F" ? "Yes" : "No",
         rt: rt ?? "Timeout"
     });
-
-    sessionStorage.setItem("results", JSON.stringify(results));
 }
 
 async function upload_results(results) {
@@ -197,10 +195,6 @@ async function main() {
         return;
     }
 
-    // 新測驗從 2-back 開始，清空上一輪暫存結果。
-    results.length = 0;
-    sessionStorage.setItem("results", JSON.stringify(results));
-
     show_elements([stimulus_screen]);
     await n_back(2);
 
@@ -227,7 +221,7 @@ async function main() {
         upload_msg.textContent =
             "資料上傳未確認成功，請通知實驗人員，並保留此頁面。";
         return;
-    }
+    } finally { sessionStorage.removeItem("participant_id"); }
 
     await wait_until(performance.now() + 2000);
 
