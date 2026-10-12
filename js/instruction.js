@@ -8,8 +8,12 @@ const back_button = document.getElementById('back-button');
 const page_position = document.getElementById('page-position');
 const practice_section = document.getElementById('practice-section');
 
-let position = -1;
+const pos_map = {
+    2: '請按空白鍵',
+    3: '請按F/J鍵'
+};
 
+let position = -1;
 function show_page(new_position) {
     position = new_position;
     cover.hidden = position !== -1;
@@ -20,10 +24,10 @@ function show_page(new_position) {
     if (position === -1) return;
     page_position.textContent = `${position + 1}/${sections.length}`;
 
-    const press_space = (position === 2) || (position === 3);
+    const keyboard_page = position in pos_map;
     back_button.disabled = false;
-    next_button.disabled = press_space;
-    next_button.textContent = press_space ? '請按空白鍵' : '下一頁';
+    next_button.disabled = keyboard_page;
+    next_button.textContent = keyboard_page ? pos_map[position] : '下一頁';
 }
 
 function wait_until(target_timestamp, action = () => {}) {
@@ -100,6 +104,7 @@ document.addEventListener('keydown', async (event) => {
         } finally {
             practicing = false;
             show_page(3);
+            next_button.textContent = '請按空白鍵';
         }
         return;
     };
