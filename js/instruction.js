@@ -2,12 +2,10 @@ const cover = document.querySelector('.cover');
 const instruction = document.querySelector('.instruction');
 const sections = document.querySelectorAll('.instruction > section');
 const navigation = document.querySelector('.navigation');
-
 const start_button = document.getElementById('start-button');
 const next_button = document.getElementById('next-button');
 const back_button = document.getElementById('back-button');
 const page_position = document.getElementById('page-position');
-
 const practice_section = document.getElementById('practice-section');
 
 let position = -1;
@@ -106,7 +104,9 @@ document.addEventListener('keydown', async (event) => {
         return;
     };
 
-    if (position === 3 && !practicing) {}
+    if (position === 3 && !practicing) {
+        window.location.href = `task.html`;
+    }
 });
 
 document.addEventListener("keydown", (event) => {
