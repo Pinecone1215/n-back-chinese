@@ -37,13 +37,12 @@ const letters_map = {
 };
 
 const key_map = {
-    Digit2: "2",
-    Numpad2: "2",
-    Digit4: "4",
-    Numpad4: "4"
+    KeyF: "F",
+    KeyJ: "J"
 };
 
 const time_limit = 1800;
+const gray_duration = 1500;
 const results = [];
 
 let response_timestamp = null;
@@ -78,6 +77,20 @@ function wait_until(target_timestamp, action = () => {}) {
     });
 }
 
+function wait_for_response() {
+    return new Promise((resolve) => {
+        function check_time(timestamp) {
+            if (answered || timestamp >= stimulus_timestamp + time_limit) {
+                resolve(timestamp);
+            } else {
+                requestAnimationFrame(check_time);
+            }
+        }
+
+        requestAnimationFrame(check_time);
+    });
+}
+
 function wait_for_space() {
     return new Promise((resolve) => {
         function on_keydown(event) {
@@ -95,16 +108,16 @@ function wait_for_space() {
 function record_result(n, trial) {
     results.push({
         stimulus_timestamp,
-        response_timestamp,
+        response_timestamp: response_timestamp ?? "Timeout",
         participant_id,
         trial,
         condition: `${n}-back_Trials`,
         response: response === null
             ? "Timeout"
-            : response === "2" ? "Yes" : "No",
+            : response === "F" ? "Yes" : "No",
         accuracy: answered && response === correct_response ? 1 : 0,
-        correct_answer: correct_response === "2" ? "Yes" : "No",
-        rt
+        correct_answer: correct_response === "F" ? "Yes" : "No",
+        rt: rt ?? "Timeout"
     });
 
     sessionStorage.setItem("results", JSON.stringify(results));
@@ -142,38 +155,40 @@ async function n_back(n) {
         hide_elements([fixation]);
     });
 
+    // 注視點消失後，等待 1000 ms 再顯示第一個字母。
+    timestamp = await wait_until(timestamp + 1000);
+
     for (const [index, l] of letters.entries()) {
-        const time = (index === 0) ? 1000 : time_limit;
+        const same = index >= n && l === letters[index - n];
+        correct_response = same ? "F" : "J";
 
-        timestamp = await wait_until(
-            timestamp + time,
-            (frame_timestamp) => {
-                if (index > 0) record_result(n, index);
+        answered = false;
+        response = null;
+        rt = null;
+        response_timestamp = null;
+        stimulus_timestamp = timestamp;
 
-                const same = index >= n && l === letters[index - n];
-                correct_response = same ? "2" : "4";
+        letter.style.color = "";
+        letter.textContent = l;
+        show_elements([letter]);
 
-                answered = false;
-                response = null;
-                rt = null;
-                response_timestamp = null;
-                stimulus_timestamp = frame_timestamp;
+        // 最多等待 1800 ms，收到作答就提前結束。
+        timestamp = await wait_for_response();
 
-                letter.style.color = "";
-                letter.textContent = l;
-                show_elements([letter]);
-            }
-        );
+        // 字母已在按鍵事件中變灰，保留到按鍵後 1500 ms。
+        if (answered)
+            timestamp = await wait_until(
+                response_timestamp + gray_duration
+            );
+
+        // 每題結束後立即記錄，包含最後一題。
+        record_result(n, index + 1);
     }
 
-    await wait_until(timestamp + time_limit, () => {
-        record_result(n, letters.length);
-
-        testing = false;
-        correct_response = null;
-        stimulus_timestamp = null;
-        hide_elements([letter]);
-    });
+    testing = false;
+    correct_response = null;
+    stimulus_timestamp = null;
+    hide_elements([letter]);
 }
 
 async function main() {

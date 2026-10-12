@@ -10,14 +10,12 @@ const practice_section = document.getElementById('practice-section');
 
 const pos_map = {
     2: '請按空白鍵',
-    3: '請按 2/4 鍵'
+    3: '請按 F/J 鍵'
 };
 
 const key_map = {
-    Digit2: "2",
-    Numpad2: "2",
-    Digit4: "4",
-    Numpad4: "4"
+    KeyF: "F",
+    KeyJ: "J"
 };
 
 let position = -1;
@@ -75,7 +73,7 @@ async function practice(section, n) {
         timestamp = await wait_until(timestamp + time, () => {
             const same = index >= n && l === letters_practice[index - n];
 
-            correct_response = same ? "2" : "4";
+            correct_response = same ? "F" : "J";
             answered = false;
 
             hide_elements([feedback]);
