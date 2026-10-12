@@ -10,7 +10,14 @@ const practice_section = document.getElementById('practice-section');
 
 const pos_map = {
     2: '請按空白鍵',
-    3: '請按 F/J 鍵'
+    3: '請按 2/4 鍵'
+};
+
+const key_map = {
+    Digit2: "2",
+    Numpad2: "2",
+    Digit4: "4",
+    Numpad4: "4"
 };
 
 let position = -1;
@@ -64,11 +71,11 @@ async function practice(section, n) {
     timestamp = await wait_until(timestamp + 1000, () => { hide_elements([fixation]); });
 
     for (const [index, l] of letters_practice.entries()) {
-        const time = (index === 0) ? 1000 : 2000;
+        const time = (index === 0) ? 1000 : 1800;
         timestamp = await wait_until(timestamp + time, () => {
             const same = index >= n && l === letters_practice[index - n];
 
-            correct_response = same ? "F" : "J";
+            correct_response = same ? "2" : "4";
             answered = false;
 
             hide_elements([feedback]);
@@ -77,7 +84,7 @@ async function practice(section, n) {
         });
     }
 
-    await wait_until(timestamp + 2000, () => {
+    await wait_until(timestamp + 1800, () => {
         correct_response = null;
         hide_elements([letter, feedback]);
         show_elements([msg]);
@@ -116,7 +123,7 @@ document.addEventListener('keydown', async (event) => {
 
 document.addEventListener("keydown", (event) => {
     if (!practicing || event.repeat) return;
-    if (event.code !== "KeyF" && event.code !== "KeyJ") return;
+    if (!(event.code in key_map)) return;
 
     const letter = practice_section.querySelector(".letter");
     const feedback = practice_section.querySelector(".feedback");
@@ -126,7 +133,7 @@ document.addEventListener("keydown", (event) => {
     event.preventDefault();
     answered = true;
 
-    const response = event.code === "KeyF" ? "F" : "J";
+    const response = key_map[event.code];
     const correct = response === correct_response;
 
     feedback.textContent = correct ? "答對！" : "答錯！";

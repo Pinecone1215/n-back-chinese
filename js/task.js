@@ -31,7 +31,14 @@ const letters_map = {
     3: letters_3_back
 };
 
-const time_limit = 1500;
+const key_map = {
+    Digit2: "2",
+    Numpad2: "2",
+    Digit4: "4",
+    Numpad4: "4"
+};
+
+const time_limit = 1800;
 const results = [];
 
 let stimulus_timestamp = null;
@@ -86,9 +93,9 @@ function record_result(n, trial) {
         condition: `${n}-back_Trials`,
         response: response === null
             ? "Timeout"
-            : response === "F" ? "Yes" : "No",
+            : response === "2" ? "Yes" : "No",
         accuracy: answered && response === correct_response ? 1 : 0,
-        correct_answer: correct_response === "F" ? "Yes" : "No",
+        correct_answer: correct_response === "2" ? "Yes" : "No",
         rt
     });
 
@@ -123,7 +130,7 @@ async function n_back(n) {
                 if (index > 0) record_result(n, index);
 
                 const same = index >= n && l === letters[index - n];
-                correct_response = same ? "F" : "J";
+                correct_response = same ? "2" : "4";
 
                 answered = false;
                 response = null;
@@ -202,7 +209,7 @@ document.addEventListener("keydown", async (event) => {
 
 document.addEventListener("keydown", (event) => {
     if (!testing || event.repeat) return;
-    if (event.code !== "KeyF" && event.code !== "KeyJ") return;
+    if (!(event.code in key_map)) return;
     if (letter.hidden || answered || correct_response === null) return;
 
     event.preventDefault();
@@ -211,7 +218,7 @@ document.addEventListener("keydown", (event) => {
     if (elapsed < 0 || elapsed >= time_limit) return;
 
     answered = true;
-    response = event.code === "KeyF" ? "F" : "J";
+    response = key_map[event.code];
     rt = elapsed;
     letter.style.color = "gray";
 });
