@@ -1,7 +1,12 @@
+const DATABASE_ENDPOINT = 
+"https://script.google.com/macros/s/AKfycbwkww2vnxYGICPaIZ-KM6KcCdXUgSVfq-XH4C0R2y2uvKdwa5VgkbpDUodQTy-jcds/exec";
+
 const start_screen = document.getElementById("start-screen");
 const stimulus_screen = document.getElementById("stimulus-screen");
 const instruction_screen = document.getElementById("instruction");
 const msg_screen = document.getElementById("msg-screen");
+const upload_screen = document.getElementById("upload-screen");
+const upload_msg = upload_screen.querySelector("p");
 
 const letter = stimulus_screen.querySelector(".letter");
 const fixation = stimulus_screen.querySelector(".fixation");
@@ -105,6 +110,19 @@ function record_result(n, trial) {
     sessionStorage.setItem("results", JSON.stringify(results));
 }
 
+async function upload_results(results) {
+    const payload = { results: results };
+    const response = await fetch(DATABASE_ENDPOINT, {
+        method: "POST",
+        headers: {"Content-Type": "text/plain;charset=utf-8"},
+        body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error);
+    return data;
+}
+
 async function n_back(n) {
     if (n !== 2 && n !== 3) return;
     const letters = letters_map[n];
@@ -182,6 +200,30 @@ async function main() {
 
     // 此時 results 共包含 50 + 60 = 110 筆結果。
     hide_elements([stimulus_screen]);
+
+    upload_msg.textContent = "測驗已完成，資料上傳中，請勿關閉視窗。"
+    show_elements([upload_screen]);
+
+    try {
+        await upload_results(results);
+        upload_msg.textContent = "資料上傳完成，感謝您的參與！";
+    } catch (error) {
+        console.error("資料上傳未確認成功：", error);
+        upload_msg.textContent =
+            "資料上傳未確認成功，請通知實驗人員，並保留此頁面。";
+        return;
+    }
+
+    await wait_until(performance.now() + 2000);
+
+    try {
+        if (document.fullscreenElement)
+            await document.exitFullscreen();
+    } catch (error) {
+        console.warn("無法離開全螢幕：", error);
+    }
+
+    hide_elements([upload_screen]);
     show_elements([msg_screen]);
 }
 
@@ -192,7 +234,8 @@ hide_elements([
     instruction_screen,
     msg_screen,
     letter,
-    fixation
+    fixation,
+    upload_screen
 ]);
 
 document.addEventListener("keydown", async (event) => {

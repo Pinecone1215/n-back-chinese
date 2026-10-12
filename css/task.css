@@ -152,6 +152,24 @@ main {
     justify-content: center;
 }
 
+#upload-screen {
+    margin: auto;
+    width: 42rem;
+    height: 32rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#upload-screen p {
+    width: 100%;
+    font-size: 1.6rem;
+    text-align: center;
+}
+
 #msg-screen {
     margin: auto;
     width: 42rem;
