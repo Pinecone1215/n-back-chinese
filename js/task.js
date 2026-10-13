@@ -203,6 +203,13 @@ async function main() {
     show_elements([instruction_screen]);
     await wait_for_space();
 
+    try {
+        if (!document.fullscreenElement && document.fullscreenEnabled)
+            await document.documentElement.requestFullscreen();
+    } catch (error) {
+        console.warn("無法進入全螢幕：", error);
+    }
+
     hide_elements([instruction_screen]);
     show_elements([stimulus_screen]);
     await n_back(3);
