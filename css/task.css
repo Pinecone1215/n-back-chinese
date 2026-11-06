@@ -197,3 +197,12 @@ main {
 #msg-screen li {
     font-size: 1.6rem;
 }
+
+#two-back-score {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #666;
+}

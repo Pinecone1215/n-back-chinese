@@ -198,6 +198,13 @@ async function main() {
     show_elements([stimulus_screen]);
     await n_back(2);
 
+    const correct_count = results.filter(
+        (r) => r.condition === "2-back_Trials" && r.accuracy === 1
+    ).length;
+
+    document.getElementById("two-back-score").textContent =
+        `${correct_count}/${letters_2_back.length}`;
+
     // 在同一頁顯示 3-back 說明，等待空白鍵。
     hide_elements([stimulus_screen]);
     show_elements([instruction_screen]);
